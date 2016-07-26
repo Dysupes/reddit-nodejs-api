@@ -4,8 +4,8 @@ var mysql = require('mysql');
 // create a connection to our Cloud9 server
 var connection = mysql.createConnection({
   host     : 'localhost',
-  user     : 'root', // CHANGE THIS :)
-  password : 'Sayuri97',
+  user     : 'dysupes', // CHANGE THIS :)
+  password : '',
   database: 'reddit'
 });
 
@@ -22,168 +22,63 @@ var redditAPI = reddit(connection);
 
 
 // redditAPI.createPost({
-//   title: 'Hi World!',
-//   url: 'https://www.world.com',
+//   title: 'Hello Reddit!',
+//   url: 'https://www.reddit.com',
 //   userId: '1',
-//   subredditId: 1
-//   },
+//   subredditId: null
+//   }, 
 //   function(err, post) {
 //   if (err) {
-//     console.log(err);
+//     console.log(err);  
 //   }
 //   else {
 //     console.log(post);
-//   }
-// });
-//
-// redditAPI.createPost({
-//   title: 'Hunky dory!',
-//   url: 'https://www.western.com',
-//   userId: '1',
-//   subredditId: 2
-//   },
-//   function(err, post) {
-//   if (err) {
-//     console.log(err);
-//   }
-//   else {
-//     console.log(post);
-//   }
-// });
-//
-// redditAPI.createPost({
-//   title: 'Time to waste some time!',
-//   url: 'https://www.tinder.com',
-//   userId: '1',
-//   subredditId: 3
-//   },
-//   function(err, post) {
-//   if (err) {
-//     console.log(err);
-//   }
-//   else {
-//     console.log(post);
-//   }
-// });
-//
-// redditAPI.createPost({
-//   title: 'I want to learn what that word means!',
-//   url: 'https://www.dictionary.com',
-//   userId: '1',
-//   subredditId: 4
-//   },
-//   function(err, post) {
-//   if (err) {
-//     console.log(err);
-//   }
-//   else {
-//     console.log(post);
-//   }
+//   }  
 // });
 
 // redditAPI.createPost({
-//   title: 'Let\'s go to India',
-//   url: 'https://www.india.com',
-//   userId: '1',
-//   subredditId: 4
-//   },
+//   title: 'Howdy do!',
+//   url: 'https://www.google.com',
+//   userId: '2',
+//   subredditId: null
+//   }, 
 //   function(err, post) {
 //   if (err) {
-//     console.log(err);
+//     console.log(err);  
 //   }
 //   else {
 //     console.log(post);
-//   }
+//   }  
 // });
-//
+
 // redditAPI.createPost({
-//   title: 'Wonder Woman Movie!!',
-//   url: 'https://www.wonderwoman.com',
-//   userId: '1',
-//   subredditId: 4
-//   },
+//   title: 'Time to waste some time on Facebook!',
+//   url: 'https://www.facebook.com',
+//   userId: '3',
+//   subredditId: null
+//   }, 
 //   function(err, post) {
 //   if (err) {
-//     console.log(err);
+//     console.log(err);  
 //   }
 //   else {
 //     console.log(post);
-//   }
+//   }  
 // });
-//
+
 // redditAPI.createPost({
-//   title: 'Simon says!',
-//   url: 'https://www.simonsays.com',
-//   userId: '1',
-//   subredditId: 2
-//   },
+//   title: 'I\'d like to graduate from McGill!',
+//   url: 'https://www.mcgill.ca',
+//   userId: '4',
+//   subredditId: null
+//   }, 
 //   function(err, post) {
 //   if (err) {
-//     console.log(err);
+//     console.log(err);  
 //   }
 //   else {
 //     console.log(post);
-//   }
-// });
-//
-// redditAPI.createPost({
-//   title: 'Star Wars',
-//   url: 'https://www.starwars.com',
-//   userId: '1',
-//   subredditId: 1
-//   },
-//   function(err, post) {
-//   if (err) {
-//     console.log(err);
-//   }
-//   else {
-//     console.log(post);
-//   }
-// });
-//
-// redditAPI.createPost({
-//   title: 'Dennis the Menace!',
-//   url: 'https://www.dennisthemenace.com',
-//   userId: '1',
-//   subredditId: 3
-//   },
-//   function(err, post) {
-//   if (err) {
-//     console.log(err);
-//   }
-//   else {
-//     console.log(post);
-//   }
-// });
-//
-// redditAPI.createPost({
-//   title: 'Supernatural',
-//   url: 'https://www.supernatural.com',
-//   userId: '1',
-//   subredditId: 2
-//   },
-//   function(err, post) {
-//   if (err) {
-//     console.log(err);
-//   }
-//   else {
-//     console.log(post);
-//   }
-// });
-//
-// redditAPI.createPost({
-//   title: 'Crouching Tiger, Hidden Dragon',
-//   url: 'https://www.crouchingtiger.com',
-//   userId: '1',
-//   subredditId: 3
-//   },
-//   function(err, post) {
-//   if (err) {
-//     console.log(err);
-//   }
-//   else {
-//     console.log(post);
-//   }
+//   }  
 // });
 
 // redditAPI.createSubreddit({name: 'McGill graduation party', description: 'McGill Campus'}, function(err, res){
@@ -206,7 +101,7 @@ var redditAPI = reddit(connection);
 //   text: 'Today is a beautiful day!',
 //   userId: '1',
 //   postId: '1'
-//   },
+//   }, 
 //   function(err, post) {
 //     console.log(post);
 //   }
@@ -216,7 +111,7 @@ var redditAPI = reddit(connection);
 //   text: 'Yesterday was a beautiful day!',
 //   userId: '2',
 //   postId: '1'
-//   },
+//   }, 
 //   function(err, post) {
 //     console.log(post);
 //   }
@@ -226,7 +121,7 @@ var redditAPI = reddit(connection);
 //   text: 'What a great day to be alive!',
 //   userId: '3',
 //   postId: '2'
-//   },
+//   }, 
 //   function(err, post) {
 //     console.log(post);
 //   }
@@ -236,7 +131,7 @@ var redditAPI = reddit(connection);
 //   text: 'Man oh man, I shouldn\'t have gone out last night!',
 //   userId: '4',
 //   postId: '3'
-//   },
+//   }, 
 //   function(err, post) {
 //     console.log(post);
 //   }
@@ -246,7 +141,7 @@ var redditAPI = reddit(connection);
 //   text: 'I know that I should have studied more yesterday that\'s for sure!',
 //   userId: '1',
 //   postId: '1'
-//   },
+//   }, 
 //   function(err, result) {
 //     redditAPI.createComment({
 //       text: "I know, right?",
@@ -284,7 +179,7 @@ var redditAPI = reddit(connection);
 //   if (err) {
 //     console.log(err);
 //   }
-//   else {
+//   else { 
 //     console.log(res)
 //   }
 // });
@@ -295,7 +190,7 @@ var redditAPI = reddit(connection);
 //     if(err){
 //       console.log(err);
 //     }
-//
+ 
 //   comments.forEach(function(commentGroup){
 //     var comment1;
 //     if (commentsIndex[commentGroup.c1_id]){
@@ -309,14 +204,14 @@ var redditAPI = reddit(connection);
 //         replies: []
 //       };
 //       commentsIndex[commentGroup.c1_id] = comment1;
-//
+
 //       finalComments.push(comment1);
 //     }
-//
+
 //     if (commentGroup.c2_id === null){
 //       return;
 //     }
-//
+
 //     var comment2;
 //     if (commentsIndex[commentGroup.c2_id]){
 //       comment2 = commentsIndex[commentGroup.c2_id];
@@ -328,12 +223,12 @@ var redditAPI = reddit(connection);
 //         parentId: commentGroup.c2_parentId,
 //         replies: []
 //       }
-//
+
 //       commentsIndex[commentGroup.c2_id] = comment2;
-//
+
 //       comment1.replies.push(comment2);
 //     }
-//
+
 //     if (commentGroup.c3_id !== null){
 //       comment2.replies.push({
 //         id: commentGroup.c3_id,
@@ -344,7 +239,3 @@ var redditAPI = reddit(connection);
 //   });
 //   console.log(JSON.stringify(finalComments, null, 4));
 // });
-
-redditAPI.getLastFivePostsFromUser(1, function(err, res){
-  console.log(res);
-});

@@ -123,17 +123,17 @@ module.exports = function RedditAPI(conn) {
       // callback(null, true);
 
       // function handleResults(result){
-
+        
       //   console.log(result);
       //   callback(null, true);
       // }
 
       console.log(comment);
       conn.query(
-        `INSERT INTO comments
+        `INSERT INTO comments 
           (id, text, createdAt, updatedAt,
-          userId, postId, parentId)
-          VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          userId, postId, parentId) 
+          VALUES (?, ?, ?, ?, ?, ?, ?)`, 
           [comment.id, comment.text, date, date, comment.userId, comment.postId, comment.parentId],
           // function(err,result){
             function(err,rows){
@@ -143,7 +143,7 @@ module.exports = function RedditAPI(conn) {
             else {
               // console.log(err,rows);
               conn.query(
-                `SELECT id, text, createdAt, updatedAt, userId, postId, parentId
+                `SELECT id, text, createdAt, updatedAt, userId, postId, parentId 
                     FROM comments WHERE id = ?`, [rows.insertId],
                 function(err,result){
                   if (err) {
@@ -169,24 +169,24 @@ module.exports = function RedditAPI(conn) {
         var offset = (options.page || 0) * limit;
 
         conn.query(`
-          SELECT
-          posts.id as postsId,
-          posts.title as postsTitle,
+          SELECT 
+          posts.id as postsId, 
+          posts.title as postsTitle, 
           posts.url as postsUrl,
-          posts.createdAt as postCreatedAt,
+          posts.createdAt as postCreatedAt, 
           posts.updatedAt as postUpdatedAt,
           posts.subredditId as postSubredditId,
           users.id as userId,
           users.username as usersUsername,
           users.createdAt as userCreatedAt,
           users.updatedAt as userUpdatedAt,
-
+          
           s.id as sId,
           s.name as sName,
           s.createdAt as sCreatedAt,
           s.updatedAt as sUpdatedAt
-
-          FROM posts
+          
+          FROM posts 
             LEFT JOIN users ON users.id=posts.userId
             LEFT JOIN subreddits s ON posts.subredditId = s.id
           ORDER BY posts.createdAt DESC
@@ -233,21 +233,21 @@ module.exports = function RedditAPI(conn) {
         var offset = (options.page || 0) * limit;
 
         conn.query(`
-          SELECT
+          SELECT 
           posts.id as postsId,
-          posts.userId as postsUserId,
-          posts.title as postsTitle,
+          posts.userId as postsUserId, 
+          posts.title as postsTitle, 
           posts.url as postsUrl,
-          posts.createdAt as postCreatedAt,
+          posts.createdAt as postCreatedAt, 
           posts.updatedAt as postUpdatedAt,
           users.id as userId,
           users.username as usersUsername,
           users.createdAt as userCreatedAt,
           users.updatedAt as userUpdatedAt
-
-          FROM posts
+        
+          FROM posts 
             LEFT JOIN users ON users.id=posts.userId
-
+          
           WHERE posts.userId = ?
           ORDER BY posts.createdAt DESC
           LIMIT ? OFFSET ?`, [userId, limit, offset],
@@ -316,11 +316,11 @@ module.exports = function RedditAPI(conn) {
           c1.id as c1_id, c1.text as c1_text, c1.parentId as c1_parentId,
           c2.id as c2_Id, c2.text as c2_text, c2.parentId as c2_parentId,
           c3.id as c3_id, c3.text as c3_text, c3.parentId as c3_parentId
-
-          FROM comments as c1
+                              
+          FROM comments as c1 
             LEFT JOIN comments c2 ON c1.id = c2.parentId
             LEFT JOIN comments c3 ON c2.id = c3.parentId
-
+          
           WHERE c1.postId  = ? AND c1.parentId IS NULL`, [postId],
 
           function(err, results) {

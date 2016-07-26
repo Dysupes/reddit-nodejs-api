@@ -16,7 +16,7 @@ CREATE TABLE `posts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(300) DEFAULT NULL,
   `url` varchar(2000) DEFAULT NULL,
-  `userId` int(11) DEFAULT NULL,
+  `userId` int(11) DEFAULT NULL, 
   `createdAt` DATETIME NOT NULL,
   `updatedAt` DATETIME NOT NULL,
   PRIMARY KEY (`id`),
@@ -24,7 +24,7 @@ CREATE TABLE `posts` (
   CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- create table reddit
+-- create table reddit        
 CREATE TABLE `subreddits` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE `subreddits` (
   `updatedAt` DATETIME,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-
+  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `comments` (
@@ -50,4 +50,4 @@ CREATE TABLE `comments` (
 );
 
 -- this is what we added in my sql
-alter table posts add column subredditId int, ADD FOREIGN KEY (subredditId) REFERENCES subreddits(id); 
+alter table posts add column subredditId int, ADD FOREIGN KEY (subredditId) REFERENCES subreddits(id);
