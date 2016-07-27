@@ -22,6 +22,7 @@ module.exports = function RedditAPI(conn) {
                 */
                 if (err.code === 'ER_DUP_ENTRY') {
                   callback(new Error('A user with this username already exists'));
+                  // callback(true);
                 }
                 else {
                   callback(err);
@@ -118,17 +119,6 @@ module.exports = function RedditAPI(conn) {
         comment.parentId = null;
       }
       var date = new Date();
-
-      // console.log(comment);
-      // callback(null, true);
-
-      // function handleResults(result){
-
-      //   console.log(result);
-      //   callback(null, true);
-      // }
-
-      console.log(comment);
       conn.query(
         `INSERT INTO comments
           (id, text, createdAt, updatedAt,
@@ -159,15 +149,107 @@ module.exports = function RedditAPI(conn) {
           }
         );
       },
-      getAllPosts: function(options, callback) {
+      createUserInHTML: function(user, callback) {
+
+        // first we have to hash the password...
+        bcrypt.hash(user.password, HASH_ROUNDS, function(err, hashedPassword) {
+          if (err) {
+            callback(err);
+          }
+          else {
+            conn.query(
+              'INSERT INTO users (username, password, createdAt, updatedAt) VALUES (?, ?, ?, ?)', [user.user, hashedPassword, new Date(), new Date()],
+              function(err, result) {
+
+                if (err) {
+                  /*
+                  There can be many reasons why a MySQL query could fail. While many of
+                  them are unknown, there's a particular error about unique usernames
+                  which we can be more explicit about!
+                  */
+                  if (err.code === 'ER_DUP_ENTRY') {
+                    callback(new Error('A user with this username already exists'));
+                    // callback(false);
+                  }
+                  else {
+                    callback();
+                  }
+                }
+                else {
+                  /*
+                  Here we are INSERTing data, so the only useful thing we get back
+                  is the ID of the newly inserted row. Let's use it to find the user
+                  and return it
+                  */
+                  conn.query(
+                    'SELECT id, username, createdAt, updatedAt FROM users WHERE id = ?', [result.insertId],
+                    function(err, result) {
+                      if (err) {
+                        callback(err);
+                      }
+                      else {
+                        /*
+                        Finally! Here's what we did so far:
+                        1. Hash the user's password
+                        2. Insert the user in the DB
+                        3a. If the insert fails, report the error to the caller
+                        3b. If the insert succeeds, re-fetch the user from the DB
+                        4. If the re-fetch succeeds, return the object to the caller
+                        */
+                        callback(null, result[0]);
+                      }
+                    }
+                  );
+                }
+              }
+            );
+          }
+        });
+      },
+      createOrUpdateVote: function(vote, callback){
+        if(Math.abs(vote.vote) > 1){
+          callback(err);
+        }
+        else {
+          conn.query(
+            `INSERT INTO votes (postId, userId, vote) VALUES (?,?,?) ON UPDATE SET vote=?`, [vote.postId, vote.userId, vote.vote],
+            function (err, result){
+              if (err) {
+                callback (err);
+              }
+              else {
+                callback (null, result);
+              }
+            }
+          )
+        }
+      },
+      getAllSortedPosts: function(sorting, options, callback) {
         // In case we are called without an options parameter, shift all the parameters manually
         if (!callback) {
           callback = options;
           options = {};
         }
+        console.log(sorting);
         var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
         var offset = (options.page || 0) * limit;
 
+        var choices = "postCreatedAt";
+
+        if (sorting === "newest"){
+          choices = "postCreatedAt";
+        }
+
+        if (sorting === "top"){
+          choices = "voteScore";
+        }
+        if (sorting === 'hot'){
+          choices = 'voteScore / (UNIX_TIMESTAMP(NOW)) - (UNIX_TIMESTAMP(postCreatedAt))';
+        }
+
+        if(sorting === 'controversial'){
+          choices = 'totalVotes / (numUpvotes - numDownvotes)'
+        }
         conn.query(`
           SELECT
           posts.id as postsId,
@@ -176,7 +258,6 @@ module.exports = function RedditAPI(conn) {
           posts.createdAt as postCreatedAt,
           posts.updatedAt as postUpdatedAt,
           posts.subredditId as postSubredditId,
-          users.id as userId,
           users.username as usersUsername,
           users.createdAt as userCreatedAt,
           users.updatedAt as userUpdatedAt,
@@ -184,20 +265,27 @@ module.exports = function RedditAPI(conn) {
           s.id as sId,
           s.name as sName,
           s.createdAt as sCreatedAt,
-          s.updatedAt as sUpdatedAt
+          s.updatedAt as sUpdatedAt,
+
+          SUM(IF(vote = 1, 1, 0)) as numUpvotes,
+          SUM(IF(vote = -1, 1, 0)) as numDownvotes,
+          SUM(IF(vote != 0, 1, 0)) as totalVotes,
+          SUM(vote) as voteScore
 
           FROM posts
             LEFT JOIN users ON users.id=posts.userId
             LEFT JOIN subreddits s ON posts.subredditId = s.id
-          ORDER BY posts.createdAt DESC
+            LEFT JOIN votes ON votes.postId=posts.id
+            group by postsId
+          ORDER BY postCreatedAt DESC
           LIMIT ? OFFSET ?`, [limit, offset],
           function(err, results) {
             if (err) {
+              console.log(err);
               callback(err);
             }
             else {
               var mappedResults = results.map(function(res) {
-
                 return {
                   id: res.postsId,
                   title: res.postsTitle,
@@ -221,7 +309,7 @@ module.exports = function RedditAPI(conn) {
               callback(null, mappedResults);
             }
           }
-        );
+        )
       },
       getAllPostsFromUser: function(userId, options, callback) {
         // In case we are called without an options parameter, shift all the parameters manually
@@ -384,6 +472,71 @@ module.exports = function RedditAPI(conn) {
               })
               callback(null, mappedResults);
             };
+          }
+        );
+      },
+      getAllPosts: function(options, callback) {
+        // In case we are called without an options parameter, shift all the parameters manually
+        if (!callback) {
+          callback = options;
+          options = {};
+        }
+        var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
+        var offset = (options.page || 0) * limit;
+
+        conn.query(`
+          SELECT
+          posts.id as postsId,
+          posts.title as postsTitle,
+          posts.url as postsUrl,
+          posts.createdAt as postCreatedAt,
+          posts.updatedAt as postUpdatedAt,
+          posts.subredditId as postSubredditId,
+
+          users.id as userId,
+          users.username as usersUsername,
+          users.createdAt as userCreatedAt,
+          users.updatedAt as userUpdatedAt,
+
+          s.id as sId,
+          s.name as sName,
+          s.createdAt as sCreatedAt,
+          s.updatedAt as sUpdatedAt
+
+          FROM posts
+            LEFT JOIN users ON users.id=posts.userId
+            LEFT JOIN subreddits s ON posts.subredditId = s.id
+          ORDER BY postCreatedAt DESC
+          LIMIT ? OFFSET ?`, [limit, offset],
+          function(err, results) {
+            if (err) {
+              callback(err);
+            }
+            else {
+              var mappedResults = results.map(function(res) {
+
+                return {
+                  id: res.postsId,
+                  title: res.postsTitle,
+                  url: res.postsUrl,
+                  createdAt: res.postCreatedAt,
+                  updatedAt: res.postUpdatedAt,
+                  user: {
+                    id: res.userId,
+                    username: res.usersUsername,
+                    createdAt: res.userCreatedAt,
+                    updatedAt: res.userUpdatedAt
+                  },
+                  subreddit:{
+                    id: res.sId,
+                    name: res.sName,
+                    createdAt: res.sCreatedAt,
+                    updatedAt: res.sUpdatedAt
+                  }
+                };
+              });
+              callback(null, mappedResults);
+            }
           }
         );
       },

@@ -49,5 +49,16 @@ CREATE TABLE `comments` (
   FOREIGN KEY (`parentId`) REFERENCES `comments`(`id`)
 );
 
+CREATE TABLE `votes`(
+  `vote` TINYINT,
+  `createdAt` DATETIME,
+  `updatedAt` DATETIME,
+  `userId` int,
+  `postId` int,
+  PRIMARY KEY (`postId`, `userId`),
+  FOREIGN KEY(`userId`) REFERENCES `users` (`id`),
+  FOREIGN KEY(`postId`) REFERENCES `posts` (`id`)
+);
+
 -- this is what we added in my sql
-alter table posts add column subredditId int, ADD FOREIGN KEY (subredditId) REFERENCES subreddits(id); 
+alter table posts add column subredditId int, ADD FOREIGN KEY (subredditId) REFERENCES subreddits(id);
