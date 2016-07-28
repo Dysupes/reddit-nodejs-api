@@ -61,7 +61,7 @@ CREATE TABLE `votes`(
 );
 
 CREATE TABLE `sessions`(
-  `token` VARCHAR(1000),
+  `token` VARCHAR(500),
   `userId` int,
   FOREIGN KEY (`userId`) REFERENCES `users` (`id`)
 );

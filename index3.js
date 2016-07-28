@@ -76,11 +76,19 @@ app.post('/login', function (request, response){
   user,
   password,
   function (err, user){
-    if (err){
-      response.redirect('/login');
+    if (err) {
+      response.status(401).send(err.message);
     }
     else {
-      response.redirect('/homepage');
+      redditAPI.createSession(user.id, function(err,token){
+        if (err){
+          response.status(500).send('An error occurred');
+        }
+        else {
+          response.cookie('SESSIONS', token);
+          response.redirect('/homepage');
+        }
+      });
     }
   });
 });
@@ -97,14 +105,9 @@ app.get('/homepage', function (request, response){
         <li>
           <p><a href="${post.url}">
             ${post.title}
-          </a</p>
+          </a></p>
           <p>
             ${post.createdAt}
-          </p>
-        </li>
-        <li>
-          <p>
-            ${post.url}
           </p>
         </li>
       </ul>

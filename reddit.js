@@ -1,5 +1,11 @@
 var bcrypt = require('bcrypt');
+var secureRandom = require('secure-random');
+
 var HASH_ROUNDS = 10;
+
+var createSessionToken = function(){
+  return secureRandom.randomArray(100).map(code => code.toString(36)).join('');
+};
 
 module.exports = function RedditAPI(conn) {
   return {
@@ -555,6 +561,18 @@ module.exports = function RedditAPI(conn) {
             }
           }
         );
+      },
+      createSession: function(userId, callback) {
+        var token = createSessionToken();
+        conn.query(`
+          INSERT INTO sessions SET userId = ?, token = ?`, [userId, token], function(err, result){
+            if (err){
+            callback(err);
+            }
+            else {
+              callback(null, token);
+            }
+          })
       },
   }
 }
