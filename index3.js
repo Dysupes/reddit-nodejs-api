@@ -3,6 +3,8 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var app = express();
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(cookieParser());
+app.use(checkLogInToken);
 var reddit = require('./reddit.js');
 
 var mysql = require('mysql');
@@ -15,6 +17,20 @@ var connection = mysql.createConnection({
 });
 
 var redditAPI = reddit(connection);
+
+function checkLogInToken(request, response, next){
+  if (request.cookies.SESSIONS){
+    redditAPI.getUserFromSession(request.cookies.SESSIONS, function(err, user){
+      if (user){
+        request.loggedInUser = user;
+      }
+      next();
+    });
+  }
+  else {
+    next();
+  }
+};
 
 app.get('/signUp', function(request, response){
   var htmlForm = `
@@ -141,6 +157,45 @@ app.get('/homepage', function (request, response){
       //   response.send(sortingHTMLForm);
       });
 
+});
+
+app.get('/createPost', function (request, response){
+  var createPostForm = `
+  <form action='/createPost' method='POST'>
+    <div>
+      <input type="text" name='userId' placeholder="Enter your username">
+    </div>
+    <div>
+      <input type='text' name='title' placeholder='Enter your title'>
+    </div>
+    <div>
+      <input type='text' name='url' placeholder='Enter the url'>
+    </div>
+    <button type='submit'>L</button>
+    </form>
+  `;
+  response.send(createPostForm);
+});
+
+app.post('/createPost', function (request, response){
+  if(!request.loggedInUser){
+    response.status(401).send('You should log in before attempting to create content!');
+  }
+  else {
+    redditAPI.createPost({
+      userId: request.loggedInUser.username,
+      title: request.body.title,
+      url: request.body.url
+
+    }, function (err, post){
+      if (err){
+        response.status(500).send('An error occurred');
+      }
+      else {
+      response.redirect('/homepage');
+      }
+    });
+  }
 });
 
 var server = app.listen(3000, function () {

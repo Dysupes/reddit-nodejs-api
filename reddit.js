@@ -574,5 +574,21 @@ module.exports = function RedditAPI(conn) {
             }
           })
       },
+      getUserFromSession: function(sessionToken, callback) {
+        if (!callback) {}
+
+        conn.query(`
+          SELECT token
+          FROM sessions WHERE sessions.token = ?`, [sessionToken],
+          function(err, results) {
+            if (err) {
+              callback(err);
+            }
+            else {
+              callback(null, results[0]);
+            }
+          }
+        );
+      },
   }
 }
