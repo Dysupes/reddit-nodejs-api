@@ -56,8 +56,14 @@ CREATE TABLE `votes`(
   `userId` int,
   `postId` int,
   PRIMARY KEY (`postId`, `userId`),
-  FOREIGN KEY(`userId`) REFERENCES `users` (`id`),
-  FOREIGN KEY(`postId`) REFERENCES `posts` (`id`)
+  FOREIGN KEY (`userId`) REFERENCES `users` (`id`),
+  FOREIGN KEY (`postId`) REFERENCES `posts` (`id`)
+);
+
+CREATE TABLE `sessions`(
+  `token` VARCHAR(1000),
+  `userId` int,
+  FOREIGN KEY (`userId`) REFERENCES `users` (`id`)
 );
 
 -- this is what we added in my sql

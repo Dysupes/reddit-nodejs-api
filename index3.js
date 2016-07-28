@@ -28,6 +28,9 @@ app.get('/signUp', function(request, response){
         at least one number and one uppercase letter</p>
       </div>
       <button type="submit">Create!</button>
+      <div>
+        <a href="http://localhost:3000/login">Click here to log in</a>
+      </div>
     </form>
   `;
   response.send(htmlForm);
@@ -66,10 +69,12 @@ app.get('/login', function (request, response){
 });
 
 app.post('/login', function (request, response){
-  redditAPI.checkUserLogin({
-  password: request.body.password,
-  user: request.body.user,
-},
+  var user = request.body.user;
+  var password = request.body.password;
+
+  redditAPI.checkUserLogin(
+  user,
+  password,
   function (err, user){
     if (err){
       response.redirect('/login');
@@ -90,8 +95,11 @@ app.get('/homepage', function (request, response){
       return `
       <ul>
         <li>
+          <p><a href="${post.url}">
+            ${post.title}
+          </a</p>
           <p>
-            ${post.title, post.createdAt}
+            ${post.createdAt}
           </p>
         </li>
         <li>

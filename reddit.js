@@ -149,6 +149,22 @@ module.exports = function RedditAPI(conn) {
           }
         );
       },
+      checkUserLogin: function(usersName, password, callback){
+            conn.query (
+              `SELECT * FROM users WHERE username = ?`, [usersName], function(err, result){
+                  var userCheck = result[0];
+                  var actualHashedPassword = userCheck.password;
+
+                  bcrypt.compare(password, actualHashedPassword, function (err, result){
+                      if (result === true){
+                        callback(null, userCheck);
+                      }
+                      else {
+                        callback(new Error('Username or password incorrect'));
+                      }
+                  });
+            });
+      },
       createUserInHTML: function(user, callback) {
 
         // first we have to hash the password...
@@ -230,7 +246,7 @@ module.exports = function RedditAPI(conn) {
           callback = options;
           options = {};
         }
-        console.log(sorting);
+
         var limit = options.numPerPage || 25; // if options.numPerPage is "falsy" then use 25
         var offset = (options.page || 0) * limit;
 
